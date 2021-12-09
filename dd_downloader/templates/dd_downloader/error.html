@@ -1,0 +1,15 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Error occurred</title>
+{% endblock %}
+
+{% block content %}
+	{% if error_msg %}
+		<button onclick="window.history.back()">Back</button>
+		<div style="background: red">
+			<h3><b>Error: </b></h3>
+			<p>{{ error_msg }}</p>
+		</div>
+	{% endif %}
+{% endblock %}

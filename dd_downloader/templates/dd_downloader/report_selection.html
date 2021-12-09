@@ -1,0 +1,118 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Generate a Report</title>
+{% endblock %}
+
+{% block scripts %}
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css">
+	<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<script src="https://cdn.datatables.net/datetime/1.1.1/js/dataTables.dateTime.min.js"></script>
+
+	<script type="text/javascript">
+		{% include "dd_downloader/scripts/datatable_helper.js" %}
+		$(document).ready(function() {
+			table = $('#scan_datatable').DataTable({
+				dom: 'Blrtip',
+				buttons: [
+					'selectAll',
+					'selectNone',
+					{text: 'Generate',extend: 'selected', action: function() {generate_report();}}
+				],
+				columns: [
+					{data: 'PK'},
+					{data: 'Scan Name',render: render_hyperlink},
+					{data: 'Status'},
+					{data: 'Automation',render: render_automation},
+					{data: 'Parent Scanner',render: render_hyperlink},
+					{data: 'Created On',render:render_datetime},
+					{data: 'Started On',render:render_datetime},
+					{data: 'Ended On',render:render_datetime}
+				],
+				rowId: 'PK',
+				select: {style: 'os'},
+				ajax: {url: "{% url 'dd_downloader:scan list ajax' %}"},
+			});
+			setInterval( function () {
+				table.ajax.reload(null, false);
+			}, 5000 );
+			$('input.global_filter').on('keyup click', function () {filterGlobal(table);});
+			$('input.column_filter').on('keyup click', function () {filterColumn(table, $(this).attr('data-column') );});
+
+			create_date_start = new DateTime($('#create_date_start'), {format: 'D MMM YYYY HH:mm'});
+			create_date_end = new DateTime($('#create_date_end'), {format: 'D MMM YYYY HH:mm'});
+			start_date_start = new DateTime($('#start_date_start'), {format: 'D MMM YYYY HH:mm'});
+			start_date_end = new DateTime($('#start_date_end'), {format: 'D MMM YYYY HH:mm'});
+			end_date_start = new DateTime($('#end_date_start'), {format: 'D MMM YYYY HH:mm'});
+			end_date_end = new DateTime($('#end_date_end'), {format: 'D MMM YYYY HH:mm'});
+
+			$('input.date_filter').on('change', function () {table.draw();});
+			
+			$.fn.dataTable.ext.search.push(
+				function( settings, data, dataIndex ) {
+					let t_create_date_start = create_date_start.val();
+					let t_create_date_end = create_date_end.val();
+					let t_start_date_start = start_date_start.val();
+					let t_start_date_end = start_date_end.val();
+					let t_end_date_start = end_date_start.val();
+					let t_end_date_end = end_date_end.val();
+					
+					var create_date = new Date( data[5] );
+					var start_date = new Date( data[6] );
+					var end_date = new Date( data[7] );
+					var create_valid = (
+						(!t_create_date_start && !t_create_date_end) ||
+						(
+							!isNaN(create_date) &&
+							(
+								(!t_create_date_start && create_date <= t_create_date_end) ||
+								(t_create_date_start <= create_date && !t_create_date_end) ||
+								(t_create_date_start <= create_date && create_date <= t_create_date_end)
+							)
+						)
+					);
+					var start_valid = (
+						(!t_start_date_start && !t_start_date_end) ||
+						(
+							!isNaN(start_date) &&
+							(
+								(!t_start_date_start && start_date <= t_start_date_end) ||
+								(t_start_date_start <= start_date && !t_start_date_end) ||
+								(t_start_date_start <= start_date && start_date <= t_start_date_end)
+							)
+						)
+					);
+					var end_valid = (
+						(!t_end_date_start && !t_end_date_end) ||
+						(
+							!isNaN(end_date) &&
+							(
+								(!t_end_date_start && end_date <= t_end_date_end) ||
+								(t_end_date_start <= end_date && !t_end_date_end) ||
+								(t_end_date_start <= end_date && end_date <= t_end_date_end)
+							)
+						)
+					);
+					return create_valid && start_valid && end_valid;
+				}
+			);
+		});
+	</script>
+{% endblock %}
+
+{% block content %}
+	<h1>Select Scans for Report Generation</h1>
+	<br>
+	<a href="{% url 'dd_downloader:index' %}">
+		<button>View scans</button>
+	</a>
+	<a href="{% url 'dd_downloader:scanner list page' %}">
+		<button>View scanners</button>
+	</a>
+	<br>
+	{% include "dd_downloader/scan_datatable.html" %}
+{% endblock %}

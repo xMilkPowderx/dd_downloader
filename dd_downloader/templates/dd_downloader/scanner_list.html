@@ -1,0 +1,84 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>All Scanners</title>
+{% endblock %}
+
+{% block scripts %}
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css">
+	<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<script src="https://cdn.datatables.net/datetime/1.1.1/js/dataTables.dateTime.min.js"></script>
+	<script type="text/javascript">
+		{% include "dd_downloader/scripts/datatable_helper.js" %}
+		
+		$(document).ready(function() {
+			table = $('#scanner_datatable').DataTable({
+				dom: 'Blrtip',
+				buttons: [
+					'selectAll',
+					'selectNone',
+					{text: 'Delete',
+						extend: 'selected',
+						action: function() {scanner_batch_command('DL')}
+					}
+				],
+				columns: [
+					{data: 'PK'},
+					{data: 'Scanner Name',render: render_hyperlink},
+					{data: '# of Child Scans'},
+					{data: 'Created On',render: render_datetime},
+				],
+				rowId: 'PK',
+				select: {style: 'os'},
+				ajax: {url: "{% url 'dd_downloader:scanner list ajax' %}"},
+			});
+			setInterval( function () {
+				table.ajax.reload(null, false);
+			}, 5000 );
+			$('input.global_filter').on('keyup click', function () {filterGlobal(table);});
+
+			$('input.column_filter').on('keyup click', function () {filterColumn(table, $(this).attr('data-column') );});
+			create_date_start = new DateTime($('#create_date_start'), {format: 'D MMM YYYY HH:mm'});
+			create_date_end = new DateTime($('#create_date_end'), {format: 'D MMM YYYY HH:mm'});
+			$('input.date_filter').on('change', function () {table.draw();});
+			$.fn.dataTable.ext.search.push(
+				function( settings, data, dataIndex ) {
+					let t_create_date_start = create_date_start.val();
+					let t_create_date_end = create_date_end.val();
+					
+					var create_date = new Date(data[3]);
+					var create_valid = (
+						(!t_create_date_start && !t_create_date_end) ||
+						(
+							!isNaN(create_date) &&
+							(
+								(!t_create_date_start && create_date <= t_create_date_end) ||
+								(t_create_date_start <= create_date && !t_create_date_end) ||
+								(t_create_date_start <= create_date && create_date <= t_create_date_end)
+							)
+						)
+					);
+					return create_valid;
+				}
+			);
+		});
+	</script>
+{% endblock %}
+
+{% block content %}
+	<h1>All Scanners</h1>
+	<br>
+	<a href="{% url 'dd_downloader:index' %}">
+		<button>View scans</button>
+	</a>
+	<br>
+	<a href="{% url 'dd_downloader:scanner create page' %}">
+		<button>Create new scanner</button>
+	</a>
+	<br>
+	{% include "dd_downloader/scanner_datatable.html" %}
+{% endblock %}

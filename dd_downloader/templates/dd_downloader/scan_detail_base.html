@@ -1,0 +1,59 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Scan Details</title>
+{% endblock %}
+
+{% block content %}
+	<button onclick="window.history.back()">Back</button>
+	{% if scan %}
+		<h2>{{ scan.scan_name }}</h2>
+		<a href="{% url 'dd_downloader:scan edit page' scan.pk %}">
+			<button>Edit</button>
+		</a>
+		{% if scan.can_create %}
+			<a href="{% url 'dd_downloader:scan manual create endpoint' scan.pk %}">
+				<button>Create scan</button>
+			</a>
+		{% endif %}
+		{% if scan.can_start %}
+		<a href="{% url 'dd_downloader:scan manual start endpoint' scan.pk %}">
+			<button>Start scan</button>
+		</a>
+		{% endif %}
+		{% if scan.can_pause %}
+		<a href="{% url 'dd_downloader:scan manual pause endpoint' scan.pk %}">
+			<button>Pause scan</button>
+		</a>
+		{% endif %}
+		{% if scan.can_resume %}
+		<a href="{% url 'dd_downloader:scan manual resume endpoint' scan.pk %}">
+			<button>Resume scan</button>
+		</a>
+		{% endif %}
+		{% if scan.can_stop %}
+		<a href="{% url 'dd_downloader:scan manual stop endpoint' scan.pk %}">
+			<button>Stop scan</button>
+		</a>
+		{% endif %}
+		{% if scan.can_retrieve %}
+		<a href="{% url 'dd_downloader:scan manual retrieve endpoint' scan.pk %}">
+			<button>Retrieve scan results</button>
+		</a>
+		{% endif %}
+		<a href="{% url 'dd_downloader:scan delete page' scan.pk %}">
+			<button>Delete scan</button>
+		</a>
+		<p><b>PK:</b> {{ scan.pk }}</p>
+		<p><b>Status:</b> {{ scan.get_status_display }}</p>
+		<p><b>Parent:</b> <a href="{% url 'dd_downloader:scanner detail page' scan.scanner.pk %}">{{ scan.scanner.scanner_name }}</a></p>
+		<p><b>Created on:</b> {{ scan.create_date }}</p>
+		<p><b>Started on:</b> {{ scan.start_date }}</p>
+		<p><b>Ended on:</b> {{ scan.end_date }}</p>
+		
+		{% block scan_detail_extra_params %}
+		{% endblock %}
+		
+		<p><b>Notes:</b> {{ scan.notes }}</p>
+	{% endif %}
+{% endblock %}

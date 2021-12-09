@@ -1,0 +1,15 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Delete Scan</title>
+{% endblock %}
+
+{% block content %}
+	<button onclick="window.history.back()">Back</button>
+	<h2>Really delete {{ scan.scan_name }}?</h2>
+	<p><b>Scan results will <b>also</b> be deleted!<p>
+	<form action="{% url 'dd_downloader:scan delete page' scan_pk=scan.pk %}" method="post">
+		{% csrf_token %}
+		<input type="submit" name="delete" value="Delete scan"/>
+	</form>
+{% endblock %}

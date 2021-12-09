@@ -1,0 +1,18 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Edit a scanner</title>
+{% endblock %}
+
+{% block content %}
+	<button onclick="window.history.back()">Back</button>
+	<form action="{% url 'dd_downloader:scanner edit page' scanner_pk=scanner.pk %}" method="post">
+		{% csrf_token %}
+		<fieldset>
+			<legend><h3>Edit {{ scanner.scanner_name }}</h3></legend>
+			{{ form }}
+		</fieldset>
+		<input type="submit" value="Update Scanner">
+	</form>
+	
+{% endblock %}

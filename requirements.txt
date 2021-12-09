@@ -1,0 +1,6 @@
+burpsuite==0.0.3
+Django==2.2.24
+django_polymorphic==3.1.0
+requests==2.22.0
+urllib3>=1.21.1
+celery==5.2.0

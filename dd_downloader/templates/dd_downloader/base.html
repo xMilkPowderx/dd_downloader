@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		{% block title %}
+			<title>DD_Downloader</title>
+		{% endblock %}
+
+	<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	
+	{% block scripts %}
+	{% endblock %}
+
+	</head>
+	<body>
+		<div style="padding-top: 2%; padding-bottom: 2%; padding-left: 5%; padding-right: 5%">
+			{% block content %}
+			{% endblock %}
+		</div>
+	</body>
+</html>

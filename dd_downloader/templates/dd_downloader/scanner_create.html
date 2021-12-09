@@ -1,0 +1,45 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Add a scanner</title>
+{% endblock %}
+
+{% block scripts %}
+	<script>
+		$().ready(function() { 
+			$('input[name=dd_downloader_scanner_type]').change(function(){
+				$('#typeselect').submit();
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block content %}
+	<button onclick="window.history.back()">Back</button>
+	<h1>Add a scanner</h1>
+	<form id="typeselect" action="{% url 'dd_downloader:scanner create page' %}" method="get">
+		<fieldset>
+			<label>Select scanner type:</label><br>
+			{% for choice in scanner_type_list %}
+				{% if dd_downloader_scanner_type == choice %}
+					<input type="radio" name="dd_downloader_scanner_type" id="choice{{ forloop.counter }}" value="{{ choice }}" checked="checked">
+				{% else %}
+					<input type="radio" name="dd_downloader_scanner_type" id="choice{{ forloop.counter }}" value="{{ choice }}">
+				{% endif %}
+				<label for="choice{{ forloop.counter }}">{{ choice }}</label><br>
+			{% endfor %}
+		</fieldset>
+	</form>
+	{% if dd_downloader_scanner_type %}
+	<fieldset>
+		<form action="{% url 'dd_downloader:scanner create page' %}" method="post">
+			{% csrf_token %}
+			<fieldset>
+					<input type="hidden" name="dd_downloader_scanner_type" value="{{ dd_downloader_scanner_type }}">
+					{{ form }}
+			</fieldset>
+			<input type="submit" value="Create">
+		</form>
+	</fieldset>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,86 @@
+<div style="border:2px solid black; padding: 2%;">
+	<table align="left">
+		<thead>
+			<tr>
+				<th></th>
+				<th>Query</th>
+				<th>Regex</th>
+				<th></th>
+				<th>Query</th>
+				<th>Regex</th>
+				<th></th>
+				<th>Query</th>
+				<th>Regex</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>All</td>
+				<td align="center"><input type="text" class="global_filter" id="global_filter"></td>
+				<td align="center"><input type="checkbox" class="global_filter" id="global_regex"></td>
+				
+				<td>Scan Name</td>
+				<td align="center"><input type="text" class="column_filter" id="col1_filter" data-column="1"></td>
+				<td align="center"><input type="checkbox" class="column_filter" id="col1_regex" data-column="1"></td>
+
+				<td>Automation</td>
+				<td align="center"><input type="text" class="column_filter" id="col3_filter" data-column="3"></td>
+				<td align="center"><input type="checkbox" class="column_filter" id="col3_regex" data-column="3"></td>
+			</tr>
+			<tr>
+				<td>PK</td>
+				<td align="center"><input type="text" class="column_filter" id="col0_filter" data-column="0"></td>
+				<td align="center"><input type="checkbox" class="column_filter" id="col0_regex" data-column="0"></td>
+
+				<td>Status</td>
+				<td align="center"><input type="text" class="column_filter" id="col2_filter" data-column="2"></td>
+				<td align="center"><input type="checkbox" class="column_filter" id="col2_regex" data-column="2"></td>
+
+				<td>Parent Scanner</td>
+				<td align="center"><input type="text" class="column_filter" id="col4_filter" data-column="4"></td>
+				<td align="center"><input type="checkbox" class="column_filter" id="col4_regex" data-column="4"></td>
+			</tr>
+
+		</tbody>
+	</table>
+	<table align="right">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Start date</th>
+				<th>Finish date</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Create</td>
+				<td align="center"><input type="text" class="date_filter" id="create_date_start"></td>
+				<td align="center"><input type="text" class="date_filter" id="create_date_end"></td>
+			</tr>
+			<tr>
+				<td>Start</td>
+				<td align="center"><input type="text" class="date_filter" id="start_date_start"></td>
+				<td align="center"><input type="text" class="date_filter" id="start_date_end"></td>
+			</tr>
+			<tr>
+				<td>End</td>
+				<td align="center"><input type="text" class="date_filter" id="end_date_start"></td>
+				<td align="center"><input type="text" class="date_filter" id="end_date_end"></td>
+			</tr>
+		</tbody>
+	</table>
+	<table id="scan_datatable" class="display" style="width:90%">
+		<thead>
+			<tr>
+				<th>PK</th>
+				<th>Scan Name</th>
+				<th>Status</th>
+				<th>Automation</th>
+				<th>Parent Scanner</th>
+				<th>Created On</th>
+				<th>Started On</th>
+				<th>Ended On</th>
+			</tr>
+		</thead>
+	</table>
+</div>

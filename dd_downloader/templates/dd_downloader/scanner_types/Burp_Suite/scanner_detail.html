@@ -1,0 +1,6 @@
+{% extends "dd_downloader/scanner_detail_base.html" %}
+
+{% block scanner_detail_extra_params %}
+	<p><b>API URL:</b> {{ scanner.api_url }}</p>
+	<p><b>API key:</b> {{ scanner.api_key }}</p>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "dd_downloader/base.html" %}
+
+{% block title %}
+	<title>Scanner</title>
+{% endblock %}
+
+{% block scripts %}
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css">
+	<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<script src="https://cdn.datatables.net/datetime/1.1.1/js/dataTables.dateTime.min.js"></script>
+	
+	<script type="text/javascript">
+		{% include "dd_downloader/scripts/datatable_helper.js" %}
+		$(document).ready(function() {
+			table = $('#scan_datatable').DataTable({
+				dom: 'Blrtip',
+				buttons: [
+					'selectAll',
+					'selectNone',
+					{text: 'Create',extend: 'selected', action: function() {scan_batch_command('CR');}},
+					{text: 'Start',extend: 'selected', action: function() {scan_batch_command('ST');}},
+					{text: 'Pause',extend: 'selected', action: function() {scan_batch_command('PS');}},
+					{text: 'Resume',extend: 'selected', action: function() {scan_batch_command('RS');}},
+					{text: 'Stop',extend: 'selected', action: function() {scan_batch_command('SP');}},
+					{text: 'Retrieve',extend: 'selected', action: function() {scan_batch_command('RT');}},
+					{text: 'Delete',extend: 'selected', action: function() {scan_batch_command('DL');}},
+					{text: 'Download',extend: 'selected',action: function() {batch_download_command();}}
+				],
+				columns: [
+					{data: 'PK'},
+					{data: 'Scan Name',render: render_hyperlink},
+					{data: 'Status'},
+					{data: 'Automation',render: render_automation},
+					{data: 'Parent Scanner',render: render_hyperlink},
+					{data: 'Created On',render: render_datetime},
+					{data: 'Started On',render: render_datetime},
+					{data: 'Ended On',render: render_datetime}
+				],
+				rowId: 'PK',
+				select: {style: 'os'},
+				ajax: {url: "{% url 'dd_downloader:child scan list ajax' scanner.pk %}"}
+			});
+			setInterval( function () {
+				table.ajax.reload(null, false);
+			}, 5000 );
+			$('input.global_filter').on('keyup click', function () {filterGlobal(table);});
+			$('input.column_filter').on('keyup click', function () {filterColumn(table, $(this).attr('data-column') );});
+
+			create_date_start = new DateTime($('#create_date_start'), {format: 'D MMM YYYY HH:mm'});
+			create_date_end = new DateTime($('#create_date_end'), {format: 'D MMM YYYY HH:mm'});
+			start_date_start = new DateTime($('#start_date_start'), {format: 'D MMM YYYY HH:mm'});
+			start_date_end = new DateTime($('#start_date_end'), {format: 'D MMM YYYY HH:mm'});
+			end_date_start = new DateTime($('#end_date_start'), {format: 'D MMM YYYY HH:mm'});
+			end_date_end = new DateTime($('#end_date_end'), {format: 'D MMM YYYY HH:mm'});
+
+			$('input.date_filter').on('change', function () {table.draw();});
+			
+			$.fn.dataTable.ext.search.push(
+				function( settings, data, dataIndex ) {
+					let t_create_date_start = create_date_start.val();
+					let t_create_date_end = create_date_end.val();
+					let t_start_date_start = start_date_start.val();
+					let t_start_date_end = start_date_end.val();
+					let t_end_date_start = end_date_start.val();
+					let t_end_date_end = end_date_end.val();
+					//quick hack to fix a frustrating timezone issue with datatables' DateTime library
+					if (t_create_date_start) {t_create_date_start = moment(create_date_start.val()).subtract(8,'h').toDate();}
+					if (t_create_date_end) {t_create_date_end = moment(create_date_end.val()).subtract(8,'h').toDate();}
+					if (t_start_date_start) {t_start_date_start = moment(start_date_start.val()).subtract(8,'h').toDate();}
+					if (t_start_date_end) {t_start_date_end = moment(start_date_end.val()).subtract(8,'h').toDate();}
+					if (t_end_date_start) {t_end_date_start = moment(end_date_start.val()).subtract(8,'h').toDate();}
+					if (t_end_date_end) {t_end_date_end = moment(end_date_end.val()).subtract(8,'h').toDate();}
+					
+					var create_date = new Date(data[5]);
+					var start_date = new Date(data[6]);
+					var end_date = new Date(data[7]);
+					var create_valid = (
+						(!t_create_date_start && !t_create_date_end) ||
+						(
+							!isNaN(create_date) &&
+							(
+								(!t_create_date_start && create_date <= t_create_date_end) ||
+								(t_create_date_start <= create_date && !t_create_date_end) ||
+								(t_create_date_start <= create_date && create_date <= t_create_date_end)
+							)
+						)
+					);
+					var start_valid = (
+						(!t_start_date_start && !t_start_date_end) ||
+						(
+							!isNaN(start_date) &&
+							(
+								(!t_start_date_start && start_date <= t_start_date_end) ||
+								(t_start_date_start <= start_date && !t_start_date_end) ||
+								(t_start_date_start <= start_date && start_date <= t_start_date_end)
+							)
+						)
+					);
+					var end_valid = (
+						(!t_end_date_start && !t_end_date_end) ||
+						(
+							!isNaN(end_date) &&
+							(
+								(!t_end_date_start && end_date <= t_end_date_end) ||
+								(t_end_date_start <= end_date && !t_end_date_end) ||
+								(t_end_date_start <= end_date && end_date <= t_end_date_end)
+							)
+						)
+					);
+					return create_valid && start_valid && end_valid;
+				}
+			);
+		});
+	</script>
+{% endblock %}
+
+{% block content %}
+	<button onclick="window.history.back()">Back</button>
+	{% if scanner %}
+		<h2>{{ scanner.scanner_name }}</h2>
+		<a href="{% url 'dd_downloader:scanner edit page' scanner.pk %}">
+			<button>Edit</button>
+		</a>
+		<a href="{% url 'dd_downloader:scanner delete page' scanner.pk %}">
+			<button>Delete scanner</button>
+		</a>
+		<p><b>Created on:</b> {{ scanner.create_date }}</p>
+
+		{% block scanner_detail_extra_params %}
+		{% endblock %}
+		<p><b>Child scans</b></p>
+		<a href="{% url 'dd_downloader:scan create page' scanner.pk %}">
+			<button>Create new scan</button>
+		</a>
+		{% include "dd_downloader/scan_datatable.html" %}
+		<p><b>Notes:</b> {{ scanner.notes }}</p>
+	{% endif %}
+{% endblock %}

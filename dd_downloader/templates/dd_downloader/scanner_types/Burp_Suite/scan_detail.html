@@ -1,0 +1,9 @@
+{% extends "dd_downloader/scan_detail_base.html" %}
+
+{% block scan_detail_extra_params %}
+	<p><b>Endpoints:</b> {{ scan.endpoints }}</p>
+	<p><b>Scan ID:</b> {{ scan.scan_id }}</p>
+	{% if scan.result %}
+		<a href="{% url 'dd_downloader:scan result endpoint' scan.pk %}">Download results</a>
+	{% endif %}
+{% endblock %}
