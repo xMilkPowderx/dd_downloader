@@ -69,7 +69,6 @@ class Burp_Suite_Scanner(Scanner):
 class Burp_Suite_Scan(Scan):
 	endpoints = models.TextField()
 	scan_id = models.IntegerField(default=None,null=True,validators=[MinValueValidator(1)])
-
 	def can_create(self, auto=False):
 		if auto:
 			return self.status == Scan.NEW
@@ -80,7 +79,12 @@ class Burp_Suite_Scan(Scan):
 			return self.status == Scan.FINISHED
 		else:
 			return self.status == Scan.FINISHED or self.status == Scan.RETRIEVED
-
+	def can_pause(self):
+		return False
+	def can_resume(self):
+		return False
+	def can_stop(self):
+		return False
 
 	def create(self):
 		if not self.can_create():

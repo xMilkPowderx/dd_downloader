@@ -86,6 +86,22 @@ class Nessus_Scan(Scan):
 	endpoints = models.TextField()
 	override_policy_id = models.IntegerField(default=None,null=True,blank=True)
 	scan_id = models.IntegerField(null=True,default=None,validators=[MinValueValidator(1)])
+	def can_create(self, auto=False):
+		if auto:
+			return self.status == Scan.NEW
+		else:
+			return self.status == Scan.NEW or self.status == Scan.ERRORS or self.status == Scan.FINISHED
+	def can_retrieve(self, auto=False):
+		if auto:
+			return self.status == Scan.FINISHED
+		else:
+			return self.status == Scan.FINISHED or self.status == Scan.RETRIEVED
+	def can_pause(self):
+		return False
+	def can_resume(self):
+		return False
+	def can_stop(self):
+		return False
 
 	def create(self):
 		if not self.can_create():
