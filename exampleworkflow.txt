@@ -1,0 +1,19 @@
+Example workflow for running a Nessus scan on three endpoints: 172.16.36.39, 172.16.36.42, and 172.16.36.44
+
+To let the web application know about the copy of Nessus we will be using to scan the three endpoints, we need to create a Nessus type scanner object in the web application.
+
+We proceed to the scanner create page where we select 'Nessus' as the scanner type, and we input the URL of our copy of Nessus into the API URL field. We also need to create API keys to allow the web application to communicate with Nessus, so we generate API keys from Nessus and add them into the access key and secret key fields.
+
+To provide some brief information on this scanner, we can fill the Notes field with some useful information, such as "Nessus Professional instance in Tai Koo Shing Office"
+
+With the new scanner, we can create scans under it. From the scanner's detail page, we click "Create new scan", which takes us to a page where we can input the endpoints that we want to scan. In the Endpoints field, we input "172.16.36.39, 172.16.36.42, 172.16.36.44".
+
+We don't want to have to wait for the scan to finish to download the results, but we don't want to immediately start the scan - we will manually start it by ourselves later. Therefore, we tick "Auto create" and "Auto retrieve", and we leave "Auto start" unticked, so that the web application doesn't automatically start the scan when it is created. We can also add some notes to the scan, such as “Scan on the three 172.16.x.x endpoints”.
+
+The scan will be automatically created on Nessus. When it is time to start the scan, we can select the scan on the scan list page, and click "Start". This issues the START command to the scan, and the web application will communicate with the Nessus API to tell it to start the scan.
+
+After the START command has been issued, the scan is now in progress. From now on, the scan's progress will be polled every minute to see if it has finished. When it does, the scan's status will become FINISHED. But since we have ticked the "Auto retrieve" flag on the scan, the web application will automatically issue the RETRIEVE command to the scan once it reaches the FINISHED stage.
+
+When the RETRIEVE command is issued and the scan's status turns to RETRIEVED, it means the results of the scan has been successfully retrieved. The user can download the results of the scan in a ZIP format by selecting it on the scan list page. Alternatively, they can directly go to the scan's detail page and click the Download link to download only the scan's results.
+
+If the user does not need the scan object in the web application anymore, they can select it on the scan list page and click "Delete". This will not delete the scan on Nessus, but it will only delete the scanner object from the web application. Alternatively, they can directly go to the scan's detail page and click "Delete" to delete the scan. 
